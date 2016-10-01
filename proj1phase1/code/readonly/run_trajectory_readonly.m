@@ -17,9 +17,9 @@ roll0  = -30*pi/180;
 x0(1)  = 0; %x
 x0(2)  = 0; %y
 x0(3)  = 0; %z
-x0(4)  = 0; %xdot
-x0(5)  = 0; %ydot
-x0(6)  = 0; %zdot
+x0(4)  = 0; %xdot, the first derivative of x
+x0(5)  = 0; %ydot, the first derivative of y
+x0(6)  = 0; %zdot, the first derivative of z
 Quat0  = R_to_quaternion(ypr_to_R([yaw0 pitch0 roll0])');
 x0(7)  = Quat0(1);  %qw
 x0(8)  = Quat0(2);  %qx
@@ -28,20 +28,20 @@ x0(10) = Quat0(4);  %qz
 x0(11) = 0;         %p
 x0(12) = 0;         %q
 x0(13) = 0;         %r
-true_s = x0;        % true state
+true_state = x0;    % true state
 F      = params.mass*params.grav;
 M      = [0;0;0];
 
 % Time
-tstep    = 0.002;  % Time step for solving equations of motion
+time_step    = 0.002;  % Time step for solving equations of motion
 cstep    = 0.01;   % Period of calling student code
 vstep    = 0.05;   % visualization interval
 time     = 0;      % current time
-vis_time = 0;      % Time of last visualization
-time_tol = 25;     % Maximum time that the quadrotor is allowed to fly
+visual_time = 0;      % Time of last visualization
+time_total = 25;     % Maximum time that the quadrotor is allowed to fly
 
 % Visualization
-vis_init   = false;
+visual_init   = false;
 
 % h1
 thtraj     = [];
@@ -94,25 +94,25 @@ while (1)
     Fd = randn(3,1) * fnoise;
     
     % Run simulation for cstep
-    timeint = time:tstep:time+cstep;
-    [~, xsave] = ode45(@(t, s) quadEOM_readonly(t, s, F, M, Fd), timeint', true_s);
-    true_s = xsave(end,:)';
+    timeint = time:time_step:time+cstep;
+    [~, xsave] = ode45(@(t, s) quadEOM_readonly(t, s, F, M, Fd), timeint', true_state);
+    true_state = xsave(end,:)';
     time = time + cstep;
     
-    des_s = trajectory_generator(time, true_s);
-    [F,M] = controller(time, true_s, des_s);
+    des_s = trajectory_generator(time, true_state);
+    [F,M] = controller(time, true_state, des_s);
     
-    if time >= time_tol
+    if time >= time_total
         break;
     end;    
     
     %% Rlot Results
-    if time - vis_time > vstep
+    if time - visual_time > vstep
         
         %% Plot quad, fov, and estimated quad, estimated_map, and sliding window
         subplot(h1);
         hold on;
-        if ~vis_init 
+        if ~visual_init 
             grid on;    
             axis equal;        
             axis ([-5 5 -5 5 -1 4]);
@@ -123,25 +123,25 @@ while (1)
         ff = 0.3;
         nprop = 40;
         propangs = linspace(0,2*pi,nprop);        
-        tR = QuatToRot(true_s(7:10))';
+        tR = QuatToRot(true_state(7:10))';
         tpoint1 = tR*[ll;0;0];
         tpoint2 = tR*[0;ll;0];
         tpoint3 = tR*[-ll;0;0];
         tpoint4 = tR*[0;-ll;0];
         tproppts = rr*tR*[cos(propangs);sin(propangs);zeros(1,nprop)];        
-        twp1 = true_s(1:3) + tpoint1;
-        twp2 = true_s(1:3) + tpoint2;
-        twp3 = true_s(1:3) + tpoint3;
-        twp4 = true_s(1:3) + tpoint4;
+        twp1 = true_state(1:3) + tpoint1;
+        twp2 = true_state(1:3) + tpoint2;
+        twp3 = true_state(1:3) + tpoint3;
+        twp4 = true_state(1:3) + tpoint4;
         tprop1 = tproppts + twp1*ones(1,nprop);
         tprop2 = tproppts + twp2*ones(1,nprop);
         tprop3 = tproppts + twp3*ones(1,nprop);
         tprop4 = tproppts + twp4*ones(1,nprop);    
-        tfov0 = true_s(1:3);        
-        tfov1 = tR * [ff;  ff * tan(ifov*pi/180/2);  ff * tan(ifov*pi/180/2)] + true_s(1:3);
-        tfov2 = tR * [ff;  ff * tan(ifov*pi/180/2); -ff * tan(ifov*pi/180/2)] + true_s(1:3);
-        tfov3 = tR * [ff; -ff * tan(ifov*pi/180/2); -ff * tan(ifov*pi/180/2)] + true_s(1:3);
-        tfov4 = tR * [ff; -ff * tan(ifov*pi/180/2);  ff * tan(ifov*pi/180/2)] + true_s(1:3);
+        tfov0 = true_state(1:3);        
+        tfov1 = tR * [ff;  ff * tan(ifov*pi/180/2);  ff * tan(ifov*pi/180/2)] + true_state(1:3);
+        tfov2 = tR * [ff;  ff * tan(ifov*pi/180/2); -ff * tan(ifov*pi/180/2)] + true_state(1:3);
+        tfov3 = tR * [ff; -ff * tan(ifov*pi/180/2); -ff * tan(ifov*pi/180/2)] + true_state(1:3);
+        tfov4 = tR * [ff; -ff * tan(ifov*pi/180/2);  ff * tan(ifov*pi/180/2)] + true_state(1:3);
         eR = QuatToRot(des_s(7:10))';
         epoint1 = eR*[ll;0;0];
         epoint2 = eR*[0;ll;0];
@@ -158,8 +158,8 @@ while (1)
         eprop4  = eproppts + ewp4*ones(1,nprop);     
         emap    = [0;0;0];
         ewindow = [0;0;0];
-        if ~vis_init
-            thtraj = plot3(true_s(1), true_s(2), true_s(3), 'b-','LineWidth',3);                        
+        if ~visual_init
+            thtraj = plot3(true_state(1), true_state(2), true_state(3), 'b-','LineWidth',3);                        
             tharm1 = line([twp1(1),twp3(1)],[twp1(2),twp3(2)],[twp1(3),twp3(3)],'Color','b');
             tharm2 = line([twp2(1),twp4(1)],[twp2(2),twp4(2)],[twp2(3),twp4(3)],'Color','b');
             thprop1 = plot3(tprop1(1,:),tprop1(2,:),tprop1(3,:),'r-');
@@ -180,9 +180,9 @@ while (1)
             ehmap    = plot3(emap(1,:), emap(2,:), emap(3,:),'ko','MarkerSize',10,'MarkerFaceColor','k');
             ehwindow = plot3(ewindow(1,:), ewindow(2,:), ewindow(3,:),'ro','MarkerSize',5,'MarkerFaceColor','r');            
         else
-            set(thtraj, 'XData', [get(thtraj, 'XData') true_s(1)]);             
-            set(thtraj, 'YData', [get(thtraj, 'YData') true_s(2)]);                        
-            set(thtraj, 'ZData', [get(thtraj, 'ZData') true_s(3)]);                                    
+            set(thtraj, 'XData', [get(thtraj, 'XData') true_state(1)]);             
+            set(thtraj, 'YData', [get(thtraj, 'YData') true_state(2)]);                        
+            set(thtraj, 'ZData', [get(thtraj, 'ZData') true_state(3)]);                                    
             set(thprop1,'XData',tprop1(1,:));
             set(thprop1,'YData',tprop1(2,:));
             set(thprop1,'ZData',tprop1(3,:));
@@ -245,16 +245,16 @@ while (1)
         
         %% Plot roll orientation
         subplot(h2);          
-%        true_ypr = R_to_ypr(quaternion_to_R(true_s(7:10))')*180/pi;      
-        [true_r,true_p,true_y] = RotToRPY_ZXY(quaternion_to_R(true_s(7:10))');      
+%        true_ypr = R_to_ypr(quaternion_to_R(true_state(7:10))')*180/pi;      
+        [true_r,true_p,true_y] = RotToRPY_ZXY(quaternion_to_R(true_state(7:10))');      
         true_ypr = [true_y,true_p,true_r] *180/pi;
-        if ~vis_init 
+        if ~visual_init 
             hold on;            
             throll  = plot(time, true_ypr(3),'r-','LineWidth',1);
             hold off;
             xlabel('Time (s)');
             ylabel('roll degree');
-            axis ([0, time_tol, -45, 45]);               
+            axis ([0, time_total, -45, 45]);               
         else
             hold on;
             set(throll, 'XData', [get(throll, 'XData') time]);
@@ -264,13 +264,13 @@ while (1)
         
         %% Plot pitch orientation
         subplot(h3);               
-        if ~vis_init 
+        if ~visual_init 
             hold on;                      
             thpitch = plot(time, true_ypr(2),'r-','LineWidth',1);         
             hold off;
             xlabel('Time (s)');
             ylabel('pitch degree');
-            axis ([0, time_tol, -45, 45]);               
+            axis ([0, time_total, -45, 45]);               
         else
             hold on;           
             set(thpitch, 'XData', [get(thpitch, 'XData') time]);
@@ -280,13 +280,13 @@ while (1)
         
                 %% Plot yaw orientation
         subplot(h4);               
-        if ~vis_init 
+        if ~visual_init 
             hold on;                      
             thyaw = plot(time, true_ypr(1),'r-','LineWidth',1);         
             hold off;
             xlabel('Time (s)');
             ylabel('yaw degree');
-            axis ([0, time_tol, -45, 45]);               
+            axis ([0, time_total, -45, 45]);               
         else
             hold on;           
             set(thyaw, 'XData', [get(thyaw, 'XData') time]);
@@ -296,16 +296,16 @@ while (1)
        
         %% Plot body frame velocity
         subplot(h5);            
-        true_v = true_s(4:6);
+        true_v = true_state(4:6);
         des_v  = des_s(4:6);
-        if ~vis_init 
+        if ~visual_init 
             hold on;            
             thvx = plot(time,true_v(1),'r-','LineWidth',1);
             ehvx = plot(time,des_v(1),'b-','LineWidth',1);
             hold off;
             xlabel('Time (s) [Red: True; Blue: Des]');
             ylabel('X World Velocity (m/s)');
-            axis ([0, time_tol, -3, 3]);               
+            axis ([0, time_total, -3, 3]);               
         else        
             hold on;
             set(thvx, 'XData', [get(thvx, 'XData') time]);
@@ -316,14 +316,14 @@ while (1)
         end;
         
         subplot(h6);    
-        if ~vis_init 
+        if ~visual_init 
             hold on;            
             thvy = plot(time,true_v(2),'r-','LineWidth',1);
             ehvy = plot(time,des_v(2),'b-','LineWidth',1);
             hold off;
             xlabel('Time (s) [Red: True; Blue: Des]');
             ylabel('Y World Velocity (m/s)');
-            axis ([0, time_tol, -3, 3]);               
+            axis ([0, time_total, -3, 3]);               
         else        
             hold on;
             set(thvy, 'XData', [get(thvy, 'XData') time]);
@@ -333,14 +333,14 @@ while (1)
             hold off;  
         end;
         subplot(h7);    
-        if ~vis_init 
+        if ~visual_init 
             hold on;            
             thvz = plot(time,true_v(3),'r-','LineWidth',1);
             ehvz = plot(time,des_v(3),'b-','LineWidth',1);
             hold off;
             xlabel('Time (s) [Red: True; Blue: Des]');
             ylabel('Z World Velocity (m/s)');
-            axis ([0, time_tol, -3, 3]);               
+            axis ([0, time_total, -3, 3]);               
         else        
             hold on;
             set(thvz, 'XData', [get(thvz, 'XData') time]);
@@ -352,16 +352,16 @@ while (1)
         
         %% Plot world frame position
         subplot(h8);            
-        true_p = true_s(1:3);
+        true_p = true_state(1:3);
         des_p  = des_s(1:3);
-        if ~vis_init 
+        if ~visual_init 
             hold on;            
             thpx = plot(time,true_p(1),'r-','LineWidth',1);
             ehpx = plot(time,des_p(1),'b-','LineWidth',1);
             hold off;
             xlabel('Time (s) [Red: True; Blue: Des]');
             ylabel('X World Position (m)');
-            axis ([0, time_tol, -4, 4]);               
+            axis ([0, time_total, -4, 4]);               
         else        
             hold on;
             set(thpx, 'XData', [get(thpx, 'XData') time]);
@@ -372,14 +372,14 @@ while (1)
         end;
         
         subplot(h9);    
-        if ~vis_init 
+        if ~visual_init 
             hold on;            
             thpy = plot(time,true_p(2),'r-','LineWidth',1);
             ehpy = plot(time,des_p(2),'b-','LineWidth',1);
             hold off;
             xlabel('Time (s) [Red: True; Blue: Des]');
             ylabel('Y World Position (m)');
-            axis ([0, time_tol, -4, 4]);               
+            axis ([0, time_total, -4, 4]);               
         else        
             hold on;
             set(thpy, 'XData', [get(thpy, 'XData') time]);
@@ -389,14 +389,14 @@ while (1)
             hold off;  
         end;
         subplot(h10);    
-        if ~vis_init 
+        if ~visual_init 
             hold on;            
             thpz = plot(time,true_v(3),'r-','LineWidth',1);
             ehpz = plot(time,des_v(3),'b-','LineWidth',1);
             hold off;
             xlabel('Time (s) [Red: True; Blue: Des]');
             ylabel('Z World Position (m)');
-            axis ([0, time_tol, -4, 4]);               
+            axis ([0, time_total, -4, 4]);               
         else        
             hold on;
             set(thpz, 'XData', [get(thpz, 'XData') time]);
@@ -409,8 +409,8 @@ while (1)
         
         %% Render
         drawnow;        
-        vis_time = time;             
-        vis_init = true;
+        visual_time = time;             
+        visual_init = true;
         
     end;
 %     pause
