@@ -1,7 +1,7 @@
 % Used for HKUST ELEC 6910P 
 
 
-function run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10,trajectory_generator)
+function run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, trajectory_generator)
 
 % Sensor parameters
 fnoise = 1;           % Standard deviation of gaussian noise for external disturbance (N)
@@ -33,12 +33,12 @@ F      = params.mass*params.grav;
 M      = [0;0;0];
 
 % Time
-time_step    = 0.002;  % Time step for solving equations of motion
-cstep    = 0.01;   % Period of calling student code
-vstep    = 0.05;   % visualization interval
-time     = 0;      % current time
+time_step   = 0.002;  % Time step for solving equations of motion
+cstep       = 0.01;   % Period of calling student code
+vstep       = 0.05;   % visualization interval
+time        = 0;      % current time
 visual_time = 0;      % Time of last visualization
-time_total = 25;     % Maximum time that the quadrotor is allowed to fly
+time_total  = 25;     % Maximum time that the quadrotor is allowed to fly
 
 % Visualization
 visual_init   = false;

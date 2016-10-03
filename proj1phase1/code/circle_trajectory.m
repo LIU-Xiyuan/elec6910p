@@ -5,10 +5,14 @@ function s_des = circle_trajectory(t, true_s)
     omega=25;      
     x_des=4*cos(t*omega/180*pi);
     y_des=4*sin(t*omega/180*pi);
+%     x_des=4*cos(t*2*pi/omega);
+%     y_des=4*sin(t*2*pi/omega);
     z_des=3/25*t;          
 
     x_vdes=-omega/180*pi*4*sin(t*omega/180*pi);   
     y_vdes= omega/180*pi*4*cos(t*omega/180*pi);
+%     x_vdes=-2*pi/omega*4*sin(t*2*pi/omega);   
+%     y_vdes= 2*pi/omega*4*cos(t*2*pi/omega);
     z_vdes=3/25;           
 
     s_des(1)=x_des;
