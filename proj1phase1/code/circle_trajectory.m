@@ -23,7 +23,7 @@ function s_des = circle_trajectory(t, true_s)
     s_des(6)=z_vdes;
     
     %desired yaw angle in the flight
-    des_yaw = mod(0.2 * pi * t,2 * pi);
+    des_yaw = mod(0.1 * pi * t,2 * pi);
     ypr = [des_yaw, 0.0, 0.0];
     Rot = ypr_to_R(ypr);
     q_des = R_to_quaternion(Rot);
