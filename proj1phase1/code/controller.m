@@ -7,18 +7,18 @@ g = params.grav;
 I = params.I;
 
 % You should calculate the output F and M
-Kd1=10;
-Kp1=10;
-Kd2=10;
-Kp2=10;
-Kd3=15;
-Kp3=30;
-KpPhi=900;
-KpTheta=900;
-KpYawangle=900;
-KdPhi=50;
-KdTheta=50;
-KdYawangle=50;
+Kd1=2;
+Kp1=3;
+Kd2=2;
+Kp2=3;
+Kd3=10;
+Kp3=10;
+KpPhi=1500;
+KpTheta=1500;
+KpYawangle=150;
+KdPhi=15;
+KdTheta=15;
+KdYawangle=15;
 
 r1_des2=Kd1*(s_des(4)-s(4))+Kp1*(s_des(1)-s(1)); % second derivative of desired x
 r2_des2=Kd2*(s_des(5)-s(5))+Kp2*(s_des(2)-s(2));
@@ -32,7 +32,7 @@ Rot = QuatToRot([s(7),s(8),s(9),s(10)]');
 [phi,theta,yawangle] = RotToRPY_ZXY(Rot);
 % yawangle
 phi_des = 1/g*(r1_des2*sin(yawangle)-r2_des2*cos(yawangle));
-theta_des = 1/g*(r1_des2*cos(yawangle)-r2_des2*sin(yawangle));
+theta_des = 1/g*(r1_des2*cos(yawangle)+ r2_des2*sin(yawangle));
 
 phi1 = s(11);
 theta1 = s(12);
