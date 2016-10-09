@@ -1,10 +1,6 @@
-% written by Zhenfei Yang
-% Sept, 2015
-%
 % Used for HKUST ELEC 6910P 
 
-
-function run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9 , h10, h11)
+function run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9)
 
 % Sensor parameters
 fnoise = 1;           % Standard deviation of gaussian noise for external disturbance (N)
@@ -103,7 +99,7 @@ while (1)
     time = time + cstep;
     
     des_s = trajectory_generator(time);
-    [F,M, eRMS_p, eRMS_v] = controller(time, true_s, des_s);
+    [F,M] = controller(time, true_s, des_s);
     
     if time >= time_tol
         break;
@@ -391,49 +387,6 @@ while (1)
             hold off;  
         end;       
         
-        
-        %%%%%%%%%%%%%%%
-        subplot(h10);               
-        if ~vis_init 
-            hold on;                      
-            eRMS_p1 = plot(time, eRMS_p(1), 'r-','LineWidth',1); 
-            eRMS_p2 = plot(time, eRMS_p(2), 'b-','LineWidth',1);    
-            eRMS_p3 = plot(time, eRMS_p(3), 'k-','LineWidth',1);    
-            hold off;
-            xlabel('Time (s) [Red: x; Blue: y; Black: z ]');
-            ylabel('RMS of position');
-            axis ([0, time_tol, -0.01, 0.1]);               
-        else
-            hold on;           
-            set(eRMS_p1, 'XData', [get(eRMS_p1, 'XData') time]);
-            set(eRMS_p1, 'YData', [get(eRMS_p1, 'YData') eRMS_p(1)]);
-            set(eRMS_p2, 'XData', [get(eRMS_p2, 'XData') time]);
-            set(eRMS_p2, 'YData', [get(eRMS_p2, 'YData') eRMS_p(2)]);
-            set(eRMS_p3, 'XData', [get(eRMS_p3, 'XData') time]);
-            set(eRMS_p3, 'YData', [get(eRMS_p3, 'YData') eRMS_p(3)]);
-            hold off;
-        end  
-        
-        subplot(h11);               
-        if ~vis_init 
-            hold on;                      
-            eRMS_v1 = plot(time, eRMS_v(1), 'r-','LineWidth',1); 
-            eRMS_v2 = plot(time, eRMS_v(2), 'b-','LineWidth',1);    
-            eRMS_v3 = plot(time, eRMS_v(3), 'k-','LineWidth',1);    
-            hold off;
-            xlabel('Time (s) [Red: x; Blue: y; Black: z ]');
-            ylabel('RMS of velocity');
-            axis ([0, time_tol, -0.1, 0.3]);               
-        else
-            hold on;           
-            set(eRMS_v1, 'XData', [get(eRMS_v1, 'XData') time]);
-            set(eRMS_v1, 'YData', [get(eRMS_v1, 'YData') eRMS_v(1)]);
-            set(eRMS_v2, 'XData', [get(eRMS_v2, 'XData') time]);
-            set(eRMS_v2, 'YData', [get(eRMS_v2, 'YData') eRMS_v(2)]);
-            set(eRMS_v3, 'XData', [get(eRMS_v3, 'XData') time]);
-            set(eRMS_v3, 'YData', [get(eRMS_v3, 'YData') eRMS_v(3)]);
-            hold off;
-        end  
         
         %% Render
         drawnow;        
