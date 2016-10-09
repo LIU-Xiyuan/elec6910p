@@ -44,6 +44,7 @@ path4 = [0.0 1.0 2.0;...
          0.0 1.0 2.0;...
          1.0 2.0 3.0;];
 
+
 h1 = subplot(3,3,1);
 h2 = subplot(3,3,2);
 h3 = subplot(3,3,3);
@@ -59,7 +60,7 @@ set(gcf, 'Position', [100, 100, 1400, 1000]);
 
 
 % Trajectory Generator
-trajectory_generator([], path1, h1);
+trajectory_generator([], path2, h1);
 
 % Run Trajectory
 run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9);
