@@ -1,5 +1,5 @@
-function [F, M] = controller(t, s, s_des)
-% [F, M,e] = controller(t, s, s_des,e)
+% function [F, M] = controller(t, s, s_des)
+function [F, M, RMS_v, RMS_p] = controller(t, s, s_des, RMS_v, RMS_p)
 global params
 
 m = params.mass;
@@ -37,16 +37,12 @@ phi1 = s(11);
 theta1 = s(12);
 yawangle1 = s(13);
 
-% phi_des1 = s_des(11); % first derivative of desired angle phi
-% theta_des1 = s_des(12);
-% yawangle_des1 = s_des(13);
 phi_des1 = 0;
 theta_des1 = 0;
 yawangle_des1 = 0;
 
 dYaw = yawangle_des-yawangle;
 
-% dYaw
 if(dYaw >= pi)
     dYaw = -( 2*pi - dYaw);
 elseif(dYaw <= -pi)
@@ -62,10 +58,12 @@ F = m*(g+r3_des2);
 M = I*[phi_des2, theta_des2, yawangle_des2]'+...
     cross([s(11), s(12), s(13)]',I*[s(11), s(12), s(13)]');
 
-% times=t/0.01;
-% e = sqrt((e*e*(times-1)+(s_des(6)-s(6))*(s_des(6)-s(6)))/times);
-% e
-% RMS
+times=t/0.01;
+RMS_v = sqrt((RMS_v*RMS_v*(times-1)+(s_des(5)-s(5))*(s_des(5)-s(5)))/times);
+RMS_p = sqrt((RMS_p*RMS_p*(times-1)+(s_des(2)-s(2))*(s_des(2)-s(2)))/times);
+RMS_v
+RMS_p
+
 % M = I*[phi_des2, theta_des2, yawangle_des2]';
 % M =[0,0,0]';
 end

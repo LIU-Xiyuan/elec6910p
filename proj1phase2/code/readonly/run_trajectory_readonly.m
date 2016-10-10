@@ -87,6 +87,8 @@ ehpz       = [];
 
 % Start Simulation run_trajectory_readonly
 disp('Start Simulation ...');
+RMS_v=0;
+RMS_p=0;
 while (1)
     
     % External disturbance
@@ -99,7 +101,7 @@ while (1)
     time = time + cstep;
     
     des_s = trajectory_generator(time);
-    [F,M] = controller(time, true_s, des_s);
+    [F, M, RMS_v, RMS_p] = controller(time, true_s, des_s, RMS_v, RMS_p);
     
     if time >= time_tol
         break;

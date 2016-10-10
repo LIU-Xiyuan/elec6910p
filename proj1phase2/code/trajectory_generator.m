@@ -74,7 +74,6 @@ if nargin > 1 % pre-process can be done here (given waypoints). Pre-define the e
     Pz = quadprog(Q,[],[],[],A,Dz);
 else % output desired state along the trajectory here (given time).
     key=0;
-    t
     for i=1:m-1
         if(t>=Ta(i) && t<=Ta(i+1))
             key=i;
@@ -90,8 +89,6 @@ else % output desired state along the trajectory here (given time).
     s_des(4)=7*Px(8+key*8)*t^6+6*Px(7+key*8)*t^5+5*Px(6+key*8)*t^4+4*Px(5+key*8)*t^3+3*Px(4+key*8)*t^2+2*Px(3+key*8)*t^1+Px(2+key*8)*t^0;
     s_des(5)=7*Py(8+key*8)*t^6+6*Py(7+key*8)*t^5+5*Py(6+key*8)*t^4+4*Py(5+key*8)*t^3+3*Py(4+key*8)*t^2+2*Py(3+key*8)*t^1+Py(2+key*8)*t^0;
     s_des(6)=7*Pz(8+key*8)*t^6+6*Pz(7+key*8)*t^5+5*Pz(6+key*8)*t^4+4*Pz(5+key*8)*t^3+3*Pz(4+key*8)*t^2+2*Pz(3+key*8)*t^1+Pz(2+key*8)*t^0;
-
-    s_des(4)
     
     s_des(7:10)=R_to_quaternion(ypr_to_R([0,0,0]));
     s_des = s_des';
