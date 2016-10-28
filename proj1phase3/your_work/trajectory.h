@@ -71,9 +71,7 @@ bool trajectory_control(const double dT,
 	    break;
 	  }
 	}
-//	std::cout<<"t "<<t<<std::endl;
-//	std::cout<<"dT"<<dT<<std::endl;
-	//key=key-1;
+	
 	desired_p[0]=px[7+key*8]*pow(t,7)+px[6+key*8]*pow(t,6)+px[5+key*8]*pow(t,5)+px[4+key*8]*pow(t,4)+
 			px[3+key*8]*pow(t,3)+px[2+key*8]*pow(t,2)+px[1+key*8]*pow(t,1)+px[0+key*8]*pow(t,0);
 	desired_p[1]=py[7+key*8]*pow(t,7)+py[6+key*8]*pow(t,6)+py[5+key*8]*pow(t,5)+py[4+key*8]*pow(t,4)+
@@ -86,14 +84,6 @@ bool trajectory_control(const double dT,
 			3*py[3+key*8]*pow(t,2)+2*py[2+key*8]*pow(t,1)+1*py[1+key*8]*pow(t,0);
 	desired_v[2]=7*pz[7+key*8]*pow(t,6)+6*pz[6+key*8]*pow(t,5)+5*pz[5+key*8]*pow(t,4)+4*pz[4+key*8]*pow(t,3)+
 			3*pz[3+key*8]*pow(t,2)+2*pz[2+key*8]*pow(t,1)+1*pz[1+key*8]*pow(t,0);
-	//desired_a[0]=7*6*px[8+key*8]*pow(t,5)+6*5*px[8+key*8]*pow(t,4)+5*4*px[8+key*8]*pow(t,3)+4*3*px[8+key*8]*pow(t,2)+
-	//		3*2*px[8+key*8]*pow(t,1)+2*1*px[8+key*8]*pow(t,0);
-	//desired_a[1]=7*6*py[8+key*8]*pow(t,5)+6*5*py[8+key*8]*pow(t,4)+5*4*py[8+key*8]*pow(t,3)+4*3*py[8+key*8]*pow(t,2)+
-	//		3*2*py[8+key*8]*pow(t,1)+2*1*py[8+key*8]*pow(t,0);
-	//desired_a[2]=7*6*pz[8+key*8]*pow(t,5)+6*5*pz[8+key*8]*pow(t,4)+5*4*pz[8+key*8]*pow(t,3)+4*3*pz[8+key*8]*pow(t,2)+
-	//		3*2*pz[8+key*8]*pow(t,1)+2*1*pz[8+key*8]*pow(t,0);
-	//std::cout<<"desired_p[0]"<<desired_p[0]<<std::endl;
-	
 	if(dT>Ta[6])
 	{
 	  desired_p[0]=1.8;
@@ -102,7 +92,6 @@ bool trajectory_control(const double dT,
 	  desired_v[2]=0;desired_v[1]=0;desired_v[2]=0;
 	  desired_a[0]=0;desired_a[1]=0;desired_a[2]=0;
 	}	
-	
 
     //output
     desired_pos.x() = desired_p[0];
@@ -111,18 +100,9 @@ bool trajectory_control(const double dT,
     desired_vel.x() = desired_v[0];
     desired_vel.y() = desired_v[1];
     desired_vel.z() = desired_v[2];
-    desired_acc.x() = 0;
-    std::cout<< "dt " << dT << std::endl;
-    std::cout<< "my t" << t << std::endl;
-    std::cout<< "des pos x " << desired_pos.x() << std::endl;
-    std::cout<< "des vel x " << desired_vel.x() << std::endl;
-    std::cout<< "des acc x " << desired_acc.x() << std::endl;
-    
-//desired_a[0];
-    desired_acc.y() = 0;
-//desired_a[1];
-    desired_acc.z() = 0;
-//desired_a[2];
+    desired_acc.x() = 0; //desired_a[0];
+    desired_acc.y() = 0; //desired_a[1];
+    desired_acc.z() = 0; //desired_a[2];
 
     return true; // if you have got desired states, true.
 }
