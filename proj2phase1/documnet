@@ -1,0 +1,4 @@
+1. the root mean square of the error is 3.05956.
+
+2. by using linear method for 3D to 2D pose estimation, we first calculate the Ax=0 using the sigular value composition, then we avoid distortion using the opencv function, so that there won't be any miss reference points.
+

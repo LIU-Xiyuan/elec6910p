@@ -64,7 +64,7 @@ set(gcf, 'Position', [100, 100, 1400, 1000]);
 
 
 % Trajectory Generator
-trajectory_generator([], path3, h1);
+trajectory_generator([], path1, h1);
 
 % Run Trajectory
 run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9);
